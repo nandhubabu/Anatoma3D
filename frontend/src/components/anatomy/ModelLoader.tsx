@@ -40,3 +40,4 @@ export const ModelLoader: React.FC = () => {
     </Html>
   );
 };
+
