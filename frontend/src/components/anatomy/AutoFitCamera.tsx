@@ -30,3 +30,4 @@ export const AutoFitCamera: React.FC<AutoFitCameraProps> = ({
 
   return null;
 };
+

@@ -105,3 +105,4 @@ export const AnatomicalLeaderLabel: React.FC<AnatomicalLeaderLabelProps> = ({
     </Html>
   );
 };
+
