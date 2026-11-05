@@ -1,7 +1,7 @@
 import React, { useRef, useMemo } from 'react';
-import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { ExplorationMode, CuttingPlaneConfig, OrganSubcomponent } from '../../types/anatomy';
+import { AnatomicalLeaderLabel } from './AnatomicalLeaderLabel';
 
 interface GenericOrgan3DProps {
   slug: string;
@@ -115,24 +115,16 @@ export const GenericOrgan3D: React.FC<GenericOrgan3DProps> = ({
             </mesh>
 
             {showLabels && (explodeFactor > 0.35 || isSelected || isHovered) && (
-              <Html
-                position={[0, 0.4, 0]}
-                center
-                distanceFactor={10}
-                style={{ pointerEvents: 'none' }}
-              >
-                <div
-                  className={`px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap backdrop-blur-md transition-all border ${
-                    isSelected
-                      ? 'bg-amber-500 text-black font-bold border-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.5)] scale-110'
-                      : isHovered
-                      ? 'bg-[#1e222d] text-amber-300 border-amber-500/50 scale-105'
-                      : 'bg-[#0d0f14]/90 text-[#d1d5db] border-[#20242e] shadow-md'
-                  }`}
-                >
-                  {part.name}
-                </div>
-              </Html>
+              <AnatomicalLeaderLabel
+                name={part.name}
+                latinName={part.latinName}
+                isSelected={isSelected}
+                isHovered={isHovered}
+                position={[0, 0.35, 0]}
+                direction={index % 2 === 0 ? 'right' : 'left'}
+                distanceFactor={8}
+                onClick={() => onSelectStructure?.(part.id)}
+              />
             )}
           </group>
         );

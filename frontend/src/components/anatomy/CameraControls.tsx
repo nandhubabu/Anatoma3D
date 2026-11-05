@@ -15,12 +15,13 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
   distance = 4.2,
   target = [0, 0, 0]
 }) => {
-  const { camera, gl } = useThree();
+  const { camera, gl, size } = useThree();
   const targetPos = useRef<THREE.Vector3>(new THREE.Vector3());
   const isTransitioning = useRef<boolean>(false);
   const controlsRef = useRef<any>(null);
   const prevPresetRef = useRef<CameraPreset | null>(null);
   const isInitializedRef = useRef<boolean>(false);
+  const prevAspectRef = useRef<number | null>(null);
 
   // Stable target vector memoized by coordinate values
   const targetVec = useMemo(
@@ -28,14 +29,21 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
     [target[0], target[1], target[2]]
   );
 
-  // Set initial position cleanly on mount without animation or fighting
+  // Calculate responsive auto-fit distance based on current canvas viewport aspect ratio
+  const aspect = size.width / Math.max(size.height, 1);
+  const responsiveDistance = aspect < 1.0
+    ? distance * (1.1 / Math.max(aspect * 0.9, 0.45))
+    : distance;
+
+  // Set initial position cleanly on mount and adapt on significant aspect ratio shifts (e.g. mobile rotation)
   useEffect(() => {
+    const [tx, ty, tz] = target;
+
     if (!isInitializedRef.current) {
-      const [tx, ty, tz] = target;
       camera.position.set(
-        tx + distance * 0.6,
-        ty + distance * 0.45,
-        tz + distance * 0.6
+        tx + responsiveDistance * 0.6,
+        ty + responsiveDistance * 0.45,
+        tz + responsiveDistance * 0.6
       );
       camera.lookAt(tx, ty, tz);
       if (controlsRef.current) {
@@ -43,42 +51,55 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
         controlsRef.current.update();
       }
       prevPresetRef.current = preset;
+      prevAspectRef.current = aspect;
       isInitializedRef.current = true;
       isTransitioning.current = false;
       return;
     }
 
-    // Only transition if preset has explicitly changed from a user action
+    // Auto-fit on display orientation change (e.g., portrait <-> landscape)
+    if (prevAspectRef.current !== null && Math.abs(prevAspectRef.current - aspect) > 0.15) {
+      prevAspectRef.current = aspect;
+      const currentDir = camera.position.clone().sub(targetVec).normalize();
+      if (currentDir.lengthSq() < 0.001) currentDir.set(0, 0, 1);
+      camera.position.copy(targetVec.clone().add(currentDir.multiplyScalar(responsiveDistance)));
+      camera.lookAt(targetVec);
+      if (controlsRef.current) {
+        controlsRef.current.target.copy(targetVec);
+        controlsRef.current.update();
+      }
+    }
+
+    // Preset camera switches
     if (prevPresetRef.current !== preset) {
       prevPresetRef.current = preset;
       const newPos = new THREE.Vector3();
-      const [tx, ty, tz] = target;
 
       switch (preset) {
         case 'front':
-          newPos.set(tx, ty, tz + distance);
+          newPos.set(tx, ty, tz + responsiveDistance);
           break;
         case 'back':
-          newPos.set(tx, ty, tz - distance);
+          newPos.set(tx, ty, tz - responsiveDistance);
           break;
         case 'left':
-          newPos.set(tx - distance, ty, tz);
+          newPos.set(tx - responsiveDistance, ty, tz);
           break;
         case 'right':
-          newPos.set(tx + distance, ty, tz);
+          newPos.set(tx + responsiveDistance, ty, tz);
           break;
         case 'top':
-          newPos.set(tx, ty + distance, tz + 0.001);
+          newPos.set(tx, ty + responsiveDistance, tz + 0.001);
           break;
         case 'bottom':
-          newPos.set(tx, ty - distance, tz + 0.001);
+          newPos.set(tx, ty - responsiveDistance, tz + 0.001);
           break;
         case 'isometric':
         default:
           newPos.set(
-            tx + distance * 0.6,
-            ty + distance * 0.45,
-            tz + distance * 0.6
+            tx + responsiveDistance * 0.6,
+            ty + responsiveDistance * 0.45,
+            tz + responsiveDistance * 0.6
           );
           break;
       }
@@ -86,12 +107,12 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
       targetPos.current.copy(newPos);
       isTransitioning.current = true;
     }
-  }, [preset, distance, target[0], target[1], target[2]]);
+  }, [preset, responsiveDistance, target[0], target[1], target[2], aspect]);
 
   // Smooth lerp transition ONLY during explicit preset switches
   useFrame(() => {
     if (isTransitioning.current) {
-      camera.position.lerp(targetPos.current, 0.08);
+      camera.position.lerp(targetPos.current, 0.09);
       if (controlsRef.current) {
         controlsRef.current.target.copy(targetVec);
         controlsRef.current.update();
@@ -127,11 +148,11 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
       makeDefault
       enableDamping
       dampingFactor={0.12}
-      rotateSpeed={0.38}
-      zoomSpeed={0.28}
+      rotateSpeed={0.4}
+      zoomSpeed={0.3}
       panSpeed={0.4}
-      minDistance={1.0}
-      maxDistance={8.5}
+      minDistance={0.8}
+      maxDistance={Math.max(responsiveDistance * 3.0, 18)}
       target={targetVec}
       screenSpacePanning
       onStart={() => {

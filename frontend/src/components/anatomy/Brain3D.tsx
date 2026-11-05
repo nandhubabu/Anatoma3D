@@ -1,7 +1,8 @@
 import React, { useRef, useMemo } from 'react';
-import { useGLTF, Html } from '@react-three/drei';
+import { useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import { ExplorationMode, CuttingPlaneConfig } from '../../types/anatomy';
+import { AnatomicalLeaderLabel } from './AnatomicalLeaderLabel';
 
 interface Brain3DProps {
   mode: ExplorationMode;
@@ -215,7 +216,7 @@ export const Brain3D: React.FC<Brain3DProps> = ({
         })}
       </group>
 
-      {/* 3D Anatomical Labels in Exploded Mode */}
+      {/* 3D Anatomical Labels in Exploded Mode with Leader Lines */}
       {showLabels && (explodeFactor > 0.35 || selectedStructureId) && (
         <group>
           {BRAIN_REGIONS.map((region) => {
@@ -223,29 +224,16 @@ export const Brain3D: React.FC<Brain3DProps> = ({
             const isHovered = hoveredStructureId === region.id;
 
             return (
-              <Html
+              <AnatomicalLeaderLabel
                 key={region.id}
+                name={region.name}
+                isSelected={isSelected}
+                isHovered={isHovered}
                 position={region.labelPos}
-                center
+                direction={region.labelPos[0] >= 0 ? 'right' : 'left'}
                 distanceFactor={7}
-                style={{ pointerEvents: 'none' }}
-              >
-                <div
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSelectStructure?.(region.id);
-                  }}
-                  className={`px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap backdrop-blur-md transition-all border pointer-events-auto cursor-pointer ${
-                    isSelected
-                      ? 'bg-amber-500 text-black font-bold border-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.5)] scale-110'
-                      : isHovered
-                      ? 'bg-[#1e222d] text-amber-300 border-amber-500/50 scale-105'
-                      : 'bg-[#0d0f14]/90 text-[#d1d5db] border-[#20242e] shadow-md hover:border-amber-500/40'
-                  }`}
-                >
-                  {region.name}
-                </div>
-              </Html>
+                onClick={() => onSelectStructure?.(region.id)}
+              />
             );
           })}
         </group>

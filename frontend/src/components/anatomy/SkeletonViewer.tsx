@@ -1,6 +1,7 @@
 import React, { useRef, useMemo } from 'react';
-import { useGLTF, Html } from '@react-three/drei';
+import { useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
+import { AnatomicalLeaderLabel } from './AnatomicalLeaderLabel';
 
 interface SkeletonViewerProps {
   selectedBone?: string | null;
@@ -94,26 +95,17 @@ export const SkeletonViewer: React.FC<SkeletonViewerProps> = ({
               />
             </mesh>
 
-            {/* 3D Anatomical Label */}
-            {showLabels && (isSelected || isHovered || explodeFactor > 0.3) && (
-              <Html
-                position={[0, b.size[1] / 2 + 0.1, 0]}
-                center
+            {/* 3D Anatomical Label with Leader Line */}
+            {showLabels && (isSelected || isHovered || (explodeFactor && explodeFactor > 0.3)) && (
+              <AnatomicalLeaderLabel
+                name={b.name}
+                isSelected={isSelected}
+                isHovered={isHovered}
+                position={[0, b.size[1] / 2 + 0.08, 0]}
+                direction={b.pos[0] >= 0 ? 'right' : 'left'}
                 distanceFactor={7}
-                style={{ pointerEvents: 'none' }}
-              >
-                <div
-                  className={`px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap backdrop-blur-md transition-all border ${
-                    isSelected
-                      ? 'bg-amber-500 text-black font-bold border-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.5)] scale-110'
-                      : isHovered
-                      ? 'bg-[#1e222d] text-amber-300 border-amber-500/50 scale-105'
-                      : 'bg-[#0d0f14]/90 text-[#d1d5db] border-[#20242e] shadow-md'
-                  }`}
-                >
-                  {b.name}
-                </div>
-              </Html>
+                onClick={() => onSelectBone?.(b.id)}
+              />
             )}
           </group>
         );

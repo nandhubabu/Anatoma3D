@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
@@ -29,6 +29,8 @@ import { Kidneys3D } from '../components/anatomy/Kidneys3D';
 import { Stomach3D } from '../components/anatomy/Stomach3D';
 import { SkeletonViewer } from '../components/anatomy/SkeletonViewer';
 import { MuscleViewer } from '../components/anatomy/MuscleViewer';
+import { ModelLoader } from '../components/anatomy/ModelLoader';
+import { AutoFitCamera } from '../components/anatomy/AutoFitCamera';
 
 const SYSTEM_ICONS: Record<string, React.ElementType> = {
   cardiovascular: Heart,
@@ -164,74 +166,78 @@ export const BodySystems: React.FC = () => {
                   <directionalLight position={[5, 8, 5]} intensity={1.8} castShadow />
                   <directionalLight position={[-5, -4, -4]} intensity={0.6} color="#fffcf5" />
 
-                  {/* Render 3D preview model based on active system */}
-                  {activeSystem.slug === 'cardiovascular' && (
-                    <Heart3D
-                      mode="external"
-                      cuttingConfig={{ active: false, axis: 'x', position: 0, invert: false }}
-                      explodeFactor={0}
-                      isBeating={true}
-                      beatSpeed={1.0}
-                      showBloodFlow={true}
-                      showLabels={false}
-                    />
-                  )}
-                  {activeSystem.slug === 'nervous' && (
-                    <Brain3D
-                      mode="external"
-                      cuttingConfig={{ active: false, axis: 'x', position: 0, invert: false }}
-                      explodeFactor={0}
-                      showLabels={false}
-                    />
-                  )}
-                  {activeSystem.slug === 'skeletal' && (
-                    <SkeletonViewer
-                      filterRegion="all"
-                      explodeFactor={0}
-                      showLabels={false}
-                    />
-                  )}
-                  {activeSystem.slug === 'muscular' && (
-                    <MuscleViewer
-                      layerFilter="all"
-                      isContracting={true}
-                      showLabels={false}
-                    />
-                  )}
-                  {activeSystem.slug === 'respiratory' && (
-                    <Lungs3D
-                      mode="external"
-                      cuttingConfig={{ active: false, axis: 'x', position: 0, invert: false }}
-                      explodeFactor={0}
-                      showLabels={false}
-                    />
-                  )}
-                  {activeSystem.slug === 'digestive' && (
-                    <Stomach3D
-                      mode="external"
-                      cuttingConfig={{ active: false, axis: 'x', position: 0, invert: false }}
-                      explodeFactor={0}
-                      showLabels={false}
-                    />
-                  )}
-                  {activeSystem.slug === 'urinary' && (
-                    <Kidneys3D
-                      mode="external"
-                      cuttingConfig={{ active: false, axis: 'x', position: 0, invert: false }}
-                      explodeFactor={0}
-                      showLabels={false}
-                    />
-                  )}
-                  {['endocrine', 'lymphatic', 'integumentary', 'reproductive', 'immune'].includes(activeSystem.slug) && (
-                    <Heart3D
-                      mode="external"
-                      cuttingConfig={{ active: false, axis: 'x', position: 0, invert: false }}
-                      explodeFactor={0}
-                      isBeating={false}
-                      showBloodFlow={false}
-                      showLabels={false}
-                    />
-                  )}
+                  <AutoFitCamera baseDistance={4.2} />
+
+                  <Suspense fallback={<ModelLoader />}>
+                    {/* Render 3D preview model based on active system */}
+                    {activeSystem.slug === 'cardiovascular' && (
+                      <Heart3D
+                        mode="external"
+                        cuttingConfig={{ active: false, axis: 'x', position: 0, invert: false }}
+                        explodeFactor={0}
+                        isBeating={true}
+                        beatSpeed={1.0}
+                        showBloodFlow={true}
+                        showLabels={false}
+                      />
+                    )}
+                    {activeSystem.slug === 'nervous' && (
+                      <Brain3D
+                        mode="external"
+                        cuttingConfig={{ active: false, axis: 'x', position: 0, invert: false }}
+                        explodeFactor={0}
+                        showLabels={false}
+                      />
+                    )}
+                    {activeSystem.slug === 'skeletal' && (
+                      <SkeletonViewer
+                        filterRegion="all"
+                        explodeFactor={0}
+                        showLabels={false}
+                      />
+                    )}
+                    {activeSystem.slug === 'muscular' && (
+                      <MuscleViewer
+                        layerFilter="all"
+                        isContracting={true}
+                        showLabels={false}
+                      />
+                    )}
+                    {activeSystem.slug === 'respiratory' && (
+                      <Lungs3D
+                        mode="external"
+                        cuttingConfig={{ active: false, axis: 'x', position: 0, invert: false }}
+                        explodeFactor={0}
+                        showLabels={false}
+                      />
+                    )}
+                    {activeSystem.slug === 'digestive' && (
+                      <Stomach3D
+                        mode="external"
+                        cuttingConfig={{ active: false, axis: 'x', position: 0, invert: false }}
+                        explodeFactor={0}
+                        showLabels={false}
+                      />
+                    )}
+                    {activeSystem.slug === 'urinary' && (
+                      <Kidneys3D
+                        mode="external"
+                        cuttingConfig={{ active: false, axis: 'x', position: 0, invert: false }}
+                        explodeFactor={0}
+                        showLabels={false}
+                      />
+                    )}
+                    {['endocrine', 'lymphatic', 'integumentary', 'reproductive', 'immune'].includes(activeSystem.slug) && (
+                      <Heart3D
+                        mode="external"
+                        cuttingConfig={{ active: false, axis: 'x', position: 0, invert: false }}
+                        explodeFactor={0}
+                        isBeating={false}
+                        showBloodFlow={false}
+                        showLabels={false}
+                      />
+                    )}
+                  </Suspense>
 
                   <OrbitControls
                     enableDamping

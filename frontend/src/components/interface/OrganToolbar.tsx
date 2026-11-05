@@ -119,8 +119,8 @@ export const OrganToolbar: React.FC<OrganToolbarProps> = ({
             </button>
           </div>
 
-          <div className="flex items-center gap-2 flex-1 max-w-xs min-w-[200px]">
-            <span className="text-slate-400 whitespace-nowrap">Cut Depth:</span>
+          <div className="flex items-center gap-2 flex-1 min-w-[200px] w-full sm:w-auto">
+            <span className="text-slate-400 whitespace-nowrap text-[11px] font-medium">Cut Depth:</span>
             <input
               type="range"
               min="-1.5"
@@ -128,7 +128,10 @@ export const OrganToolbar: React.FC<OrganToolbarProps> = ({
               step="0.05"
               value={cuttingConfig.position}
               onChange={(e) => onUpdateCuttingConfig({ position: parseFloat(e.target.value) })}
-              className="w-full accent-rose-500 h-1.5 bg-[#252a38] rounded-lg cursor-pointer"
+              onTouchStart={(e) => e.stopPropagation()}
+              onTouchMove={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
+              className="w-full accent-rose-500 h-2 bg-[#252a38] rounded-lg cursor-pointer touch-none"
             />
             <span className="text-rose-300 font-mono w-10 text-right font-bold">
               {cuttingConfig.position.toFixed(2)}
@@ -139,20 +142,21 @@ export const OrganToolbar: React.FC<OrganToolbarProps> = ({
 
       {/* Sub-bar: Deconstructed / Exploded Mode */}
       {mode === 'exploded' && (
-        <div className="bg-[#13151c]/95 border border-[#2a2f3e] p-2.5 rounded-2xl flex items-center justify-between gap-4 text-xs shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-2 duration-200">
-          <div className="flex items-center gap-2">
+        <div className="bg-[#13151c]/95 border border-[#2a2f3e] p-2.5 rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <div className="flex items-center gap-2 flex-wrap">
             <Split className="w-3.5 h-3.5 text-amber-400" />
-            <span className="font-semibold text-amber-300">Deconstruct Anatomy:</span>
+            <span className="font-semibold text-amber-300">Explode Anatomy:</span>
             <button
               onClick={() => onSetExplodeFactor(explodeFactor > 0.05 ? 0 : 0.85)}
-              className="px-2.5 py-1 rounded-xl bg-[#1a1d26] border border-[#272c3a] text-slate-200 hover:bg-[#222634] font-medium"
+              className="px-2.5 py-1 rounded-xl bg-[#1a1d26] border border-[#272c3a] text-slate-200 hover:bg-[#222634] font-medium text-[11px]"
             >
               {explodeFactor > 0.05 ? 'Reassemble All' : 'Disassemble All'}
             </button>
           </div>
 
-          <div className="flex items-center gap-2 flex-1 max-w-sm">
-            <span className="text-slate-400 whitespace-nowrap">Distance:</span>
+          {/* Full-width touch-friendly distance slider */}
+          <div className="flex items-center gap-2 flex-1 min-w-[200px] w-full sm:w-auto">
+            <span className="text-slate-400 whitespace-nowrap text-[11px] font-medium">Distance:</span>
             <input
               type="range"
               min="0"
@@ -160,9 +164,12 @@ export const OrganToolbar: React.FC<OrganToolbarProps> = ({
               step="0.02"
               value={explodeFactor}
               onChange={(e) => onSetExplodeFactor(parseFloat(e.target.value))}
-              className="w-full accent-amber-400 h-1.5 bg-[#252a38] rounded-lg cursor-pointer"
+              onTouchStart={(e) => e.stopPropagation()}
+              onTouchMove={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
+              className="w-full accent-amber-400 h-2 bg-[#252a38] rounded-lg cursor-pointer touch-none"
             />
-            <span className="text-amber-300 font-mono w-10 text-right font-bold">
+            <span className="text-amber-300 font-mono w-10 text-right font-bold text-xs">
               {Math.round(explodeFactor * 100)}%
             </span>
           </div>
@@ -171,12 +178,12 @@ export const OrganToolbar: React.FC<OrganToolbarProps> = ({
 
       {/* X-Ray Fine Slider popover */}
       {showXraySlider && (
-        <div className="bg-[#13151c]/95 border border-[#2a2f3e] p-2.5 rounded-2xl flex items-center justify-between gap-3 text-xs shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-2 duration-150">
+        <div className="bg-[#13151c]/95 border border-[#2a2f3e] p-2.5 rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-2 duration-150">
           <div className="flex items-center gap-2">
             <Ghost className="w-3.5 h-3.5 text-slate-300" />
-            <span className="font-semibold text-slate-200">X-Ray Translucency Depth:</span>
+            <span className="font-semibold text-slate-200">X-Ray Translucency:</span>
           </div>
-          <div className="flex items-center gap-2 flex-1 max-w-xs">
+          <div className="flex items-center gap-2 flex-1 min-w-[180px] w-full sm:w-auto">
             <input
               type="range"
               min="0.1"
@@ -184,7 +191,10 @@ export const OrganToolbar: React.FC<OrganToolbarProps> = ({
               step="0.05"
               value={xrayOpacity}
               onChange={(e) => onSetXrayOpacity(parseFloat(e.target.value))}
-              className="w-full accent-slate-300 h-1.5 bg-[#252a38] rounded-lg cursor-pointer"
+              onTouchStart={(e) => e.stopPropagation()}
+              onTouchMove={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
+              className="w-full accent-slate-300 h-2 bg-[#252a38] rounded-lg cursor-pointer touch-none"
             />
             <span className="text-slate-200 font-mono w-10 text-right font-bold">
               {Math.round(xrayOpacity * 100)}%

@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
-import { useGLTF, Html } from '@react-three/drei';
+import { useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import { LayerVisibility } from '../../types/anatomy';
+import { AnatomicalLeaderLabel } from './AnatomicalLeaderLabel';
 
 interface HumanBodyViewerProps {
   layers: LayerVisibility;
@@ -198,18 +199,16 @@ export const HumanBodyViewer: React.FC<HumanBodyViewerProps> = ({
         if (!isSelected && !isHovered) return null;
 
         return (
-          <Html
+          <AnatomicalLeaderLabel
             key={item.id}
+            name={item.name}
+            isSelected={isSelected}
+            isHovered={isHovered}
             position={item.pos as [number, number, number]}
-            center
+            direction={item.pos[0] >= 0 ? 'right' : 'left'}
             distanceFactor={4}
-            style={{ pointerEvents: 'none' }}
-          >
-            <div className="px-3 py-1.5 rounded-lg bg-[#0d0f14]/95 text-amber-300 font-bold text-xs shadow-2xl border border-amber-500/60 scale-110 flex items-center gap-2 backdrop-blur-md">
-              <span className="w-2 h-2 rounded-full bg-amber-400" />
-              <span>{item.name}</span>
-            </div>
-          </Html>
+            onClick={() => onSelectStructure?.(item.id, 'organ')}
+          />
         );
       })}
     </group>

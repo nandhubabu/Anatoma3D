@@ -27,6 +27,7 @@ import { Stomach3D } from '../components/anatomy/Stomach3D';
 import { MuscleViewer } from '../components/anatomy/MuscleViewer';
 import { SkeletonViewer } from '../components/anatomy/SkeletonViewer';
 import { ModelLoader } from '../components/anatomy/ModelLoader';
+import { AutoFitCamera } from '../components/anatomy/AutoFitCamera';
 import { BodySystemData } from '../types/anatomy';
 import { anatomyApi } from '../services/anatomyApi';
 
@@ -230,6 +231,8 @@ export const Home: React.FC = () => {
                     <directionalLight position={[6, 10, 6]} intensity={1.8} color="#ffffff" />
                     <directionalLight position={[-6, -2, -4]} intensity={0.7} color="#fffcf5" />
                     <pointLight position={[0, 5, 2]} intensity={0.5} color="#ffffff" />
+
+                    <AutoFitCamera baseDistance={4.2} />
 
                     <Suspense fallback={<ModelLoader />}>
                       {showcaseTab === 'heart' && (

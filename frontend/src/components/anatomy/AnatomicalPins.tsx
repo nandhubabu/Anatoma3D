@@ -32,10 +32,17 @@ export const AnatomicalPins: React.FC<AnatomicalPinsProps> = ({
       {pins.map((pin) => {
         const isSelected = selectedId === pin.id;
         const isHovered = hoveredId === pin.id;
+        // Project leader line outside: right for x >= 0, left for x < 0
+        const isRight = pin.pos[0] >= 0;
+
+        const dx = isRight ? 46 : -46;
+        const dy = -28;
+        const hx = isRight ? 24 : -24;
+        const totalX = dx + hx;
 
         return (
           <group key={pin.id} position={pin.pos}>
-            {/* Glowing 3D Landmark Beacon */}
+            {/* Minimal Reticle Anchor Beacon on Organ Surface */}
             <mesh
               onClick={(e) => {
                 e.stopPropagation();
@@ -47,18 +54,18 @@ export const AnatomicalPins: React.FC<AnatomicalPinsProps> = ({
               }}
               onPointerOut={() => onHoverPin?.(null)}
             >
-              <sphereGeometry args={[0.045, 16, 16]} />
+              <sphereGeometry args={[0.026, 16, 16]} />
               <meshStandardMaterial
-                color={isSelected ? '#f59e0b' : isHovered ? '#fbbf24' : '#ffffff'}
-                emissive={isSelected ? '#f59e0b' : isHovered ? '#d97706' : '#94a3b8'}
-                emissiveIntensity={isSelected ? 0.9 : isHovered ? 0.6 : 0.25}
+                color={isSelected ? '#f59e0b' : isHovered ? '#fbbf24' : '#e2e8f0'}
+                emissive={isSelected ? '#f59e0b' : isHovered ? '#d97706' : '#64748b'}
+                emissiveIntensity={isSelected ? 1.0 : isHovered ? 0.8 : 0.3}
                 roughness={0.2}
               />
             </mesh>
 
-            {/* Pulsing outer aura ring */}
+            {/* Subtle beacon pulse aura */}
             <mesh>
-              <ringGeometry args={[0.06, 0.08, 24]} />
+              <ringGeometry args={[0.034, 0.046, 24]} />
               <meshBasicMaterial
                 color={isSelected ? '#f59e0b' : '#fbbf24'}
                 transparent
@@ -67,28 +74,76 @@ export const AnatomicalPins: React.FC<AnatomicalPinsProps> = ({
               />
             </mesh>
 
-            {/* High-Legibility Titanium/Obsidian Tooltip Pill */}
+            {/* Precision Anatomical Leader Line Callout (Written outside organ) */}
             <Html
-              position={[0, 0.08, 0]}
-              center
-              distanceFactor={8}
+              position={[0, 0, 0]}
               style={{ pointerEvents: 'none' }}
+              distanceFactor={8}
             >
-              <div
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onSelectPin(pin.id);
-                }}
-                className={`pointer-events-auto cursor-pointer px-2.5 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap backdrop-blur-md transition-all border flex items-center gap-1.5 shadow-xl ${
-                  isSelected
-                    ? 'bg-amber-500 text-slate-950 border-amber-300 font-bold scale-110 shadow-[0_0_15px_rgba(245,158,11,0.5)]'
-                    : isHovered
-                    ? 'bg-[#1e222e] text-amber-300 border-amber-500/60 scale-105'
-                    : 'bg-[#0f1117]/95 text-slate-200 border-[#282d3c] hover:border-amber-400 hover:text-white'
-                }`}
-              >
-                <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-slate-950' : 'bg-amber-400 animate-pulse'}`} />
-                <span>{pin.name}</span>
+              <div className="relative select-none" style={{ width: 0, height: 0 }}>
+                {/* SVG Pointer / Leader Line */}
+                <svg
+                  className="absolute pointer-events-none overflow-visible"
+                  style={{ left: 0, top: 0 }}
+                >
+                  <circle
+                    cx="0"
+                    cy="0"
+                    r="2.5"
+                    fill={isSelected ? '#f59e0b' : isHovered ? '#fbbf24' : '#ffffff'}
+                  />
+                  <polyline
+                    points={`0,0 ${dx},${dy} ${totalX},${dy}`}
+                    fill="none"
+                    stroke={isSelected ? '#f59e0b' : isHovered ? '#fbbf24' : 'rgba(226, 232, 240, 0.7)'}
+                    strokeWidth={isSelected ? '2' : '1.3'}
+                    strokeDasharray={isSelected ? 'none' : '3,2'}
+                  />
+                </svg>
+
+                {/* Short Compact Anatomical Label written cleanly OUTSIDE the organ */}
+                <div
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSelectPin(pin.id);
+                  }}
+                  onMouseEnter={() => onHoverPin?.(pin.id)}
+                  onMouseLeave={() => onHoverPin?.(null)}
+                  className={`absolute pointer-events-auto cursor-pointer transition-all duration-150 ${
+                    isRight
+                      ? 'left-[74px] -top-[40px] text-left'
+                      : 'right-[74px] -top-[40px] text-right'
+                  }`}
+                  style={{
+                    transform: isRight ? 'none' : 'translateX(0)',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  <div
+                    className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md backdrop-blur-md transition-all ${
+                      isSelected
+                        ? 'bg-[#181b24]/95 border border-amber-400 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.4)]'
+                        : isHovered
+                        ? 'bg-[#14161f]/90 border border-amber-500/50 text-white'
+                        : 'bg-[#090a0d]/85 border border-[#272b38]/70 text-slate-200 hover:text-white hover:border-slate-400'
+                    }`}
+                  >
+                    <span
+                      className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                        isSelected ? 'bg-amber-400' : isHovered ? 'bg-amber-300' : 'bg-slate-400'
+                      }`}
+                    />
+                    <span className="text-[10px] font-bold uppercase tracking-wider">
+                      {pin.name}
+                    </span>
+                  </div>
+
+                  {pin.latinName && isSelected && (
+                    <div className={`text-[9px] text-amber-400/90 font-serif italic mt-0.5 ${isRight ? 'pl-1' : 'pr-1'}`}>
+                      {pin.latinName}
+                    </div>
+                  )}
+                </div>
               </div>
             </Html>
           </group>

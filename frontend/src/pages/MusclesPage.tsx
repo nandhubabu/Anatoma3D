@@ -1,16 +1,19 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
 import {
   Activity,
   Play,
   Pause,
-  Tag
+  Tag,
+  Menu,
+  X,
+  Compass
 } from 'lucide-react';
 import { MuscleViewer } from '../components/anatomy/MuscleViewer';
+import { CameraControls } from '../components/anatomy/CameraControls';
 import { ModelLoader } from '../components/anatomy/ModelLoader';
-import { MuscleStructureData } from '../types/anatomy';
+import { MuscleStructureData, CameraPreset } from '../types/anatomy';
 import { anatomyApi } from '../services/anatomyApi';
 
 export const MusclesPage: React.FC = () => {
@@ -23,6 +26,13 @@ export const MusclesPage: React.FC = () => {
   const [layerFilter, setLayerFilter] = useState<'all' | 'superficial' | 'deep'>('all');
   const [isContracting, setIsContracting] = useState<boolean>(true);
   const [showLabels, setShowLabels] = useState<boolean>(true);
+  const [cameraPreset, setCameraPreset] = useState<CameraPreset>('front');
+  const [panelOpen, setPanelOpen] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth >= 768;
+    }
+    return false;
+  });
 
   useEffect(() => {
     anatomyApi.getMuscles().then((data) => {
@@ -37,8 +47,19 @@ export const MusclesPage: React.FC = () => {
 
   return (
     <div className="relative w-full h-[calc(100vh-4rem)] bg-[#090a0d] overflow-hidden flex">
+      {/* Mobile panel toggle button */}
+      <button
+        onClick={() => setPanelOpen(!panelOpen)}
+        className="md:hidden absolute top-4 left-4 z-30 p-2.5 rounded-xl bg-[#12141b]/95 border border-[#222633] text-rose-400 shadow-xl"
+        title="Toggle Muscle List"
+      >
+        {panelOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+      </button>
+
       {/* Left Muscular Controls & Muscle Directory */}
-      <div className="absolute top-4 left-4 z-20 flex flex-col gap-2 max-w-xs">
+      <div className={`absolute top-16 md:top-4 left-4 z-20 flex flex-col gap-2 max-w-xs w-[calc(100vw-2rem)] sm:w-auto transition-all ${
+        panelOpen ? 'opacity-100 pointer-events-auto scale-100' : 'opacity-0 pointer-events-none scale-95 md:opacity-100 md:pointer-events-auto md:scale-100'
+      }`}>
         <div className="p-4 rounded-2xl border border-[#222633] bg-[#12141b]/95 backdrop-blur-xl shadow-2xl space-y-3">
           <div className="flex items-center justify-between border-b border-[#1f232d] pb-2">
             <div className="flex items-center gap-2">
@@ -98,7 +119,10 @@ export const MusclesPage: React.FC = () => {
             {muscles.map((muscle) => (
               <button
                 key={muscle.slug}
-                onClick={() => setSelectedMuscleId(muscle.slug)}
+                onClick={() => {
+                  setSelectedMuscleId(muscle.slug);
+                  if (window.innerWidth < 768) setPanelOpen(false);
+                }}
                 className={`w-full text-left p-2 rounded-lg text-xs transition-colors flex items-center justify-between border ${
                   selectedMuscleId === muscle.slug
                     ? 'bg-rose-950/80 text-rose-300 border-rose-700 shadow-sm'
@@ -138,15 +162,10 @@ export const MusclesPage: React.FC = () => {
             />
           </Suspense>
 
-          <OrbitControls
-            enableDamping
-            dampingFactor={0.12}
-            rotateSpeed={0.38}
-            zoomSpeed={0.28}
-            panSpeed={0.4}
-            minDistance={1.2}
-            maxDistance={8.5}
-            makeDefault
+          <CameraControls
+            preset={cameraPreset}
+            distance={4.8}
+            target={[0, 0, 0]}
           />
         </Canvas>
 

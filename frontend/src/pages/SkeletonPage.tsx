@@ -1,17 +1,19 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
 import {
   Bone,
   Split,
   CheckCircle2,
   AlertCircle,
-  Tag
+  Tag,
+  Menu,
+  X
 } from 'lucide-react';
 import { SkeletonViewer } from '../components/anatomy/SkeletonViewer';
+import { CameraControls } from '../components/anatomy/CameraControls';
 import { ModelLoader } from '../components/anatomy/ModelLoader';
-import { BoneStructureData } from '../types/anatomy';
+import { BoneStructureData, CameraPreset } from '../types/anatomy';
 import { anatomyApi } from '../services/anatomyApi';
 
 export const SkeletonPage: React.FC = () => {
@@ -24,6 +26,13 @@ export const SkeletonPage: React.FC = () => {
   const [filterRegion, setFilterRegion] = useState<'all' | 'axial' | 'appendicular'>('all');
   const [explodeFactor, setExplodeFactor] = useState<number>(0);
   const [showLabels, setShowLabels] = useState<boolean>(true);
+  const [cameraPreset, setCameraPreset] = useState<CameraPreset>('front');
+  const [panelOpen, setPanelOpen] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth >= 768;
+    }
+    return false;
+  });
 
   useEffect(() => {
     anatomyApi.getSkeleton().then((data) => {
@@ -38,8 +47,19 @@ export const SkeletonPage: React.FC = () => {
 
   return (
     <div className="relative w-full h-[calc(100vh-4rem)] bg-[#090a0d] overflow-hidden flex">
+      {/* Mobile panel toggle button */}
+      <button
+        onClick={() => setPanelOpen(!panelOpen)}
+        className="md:hidden absolute top-4 left-4 z-30 p-2.5 rounded-xl bg-[#12141b]/95 border border-[#20242e] text-amber-400 shadow-xl"
+        title="Toggle Bone Directory"
+      >
+        {panelOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+      </button>
+
       {/* Left Skeleton Controls & Bone List */}
-      <div className="absolute top-4 left-4 z-20 flex flex-col gap-2 max-w-xs">
+      <div className={`absolute top-16 md:top-4 left-4 z-20 flex flex-col gap-2 max-w-xs w-[calc(100vw-2rem)] sm:w-auto transition-all ${
+        panelOpen ? 'opacity-100 pointer-events-auto scale-100' : 'opacity-0 pointer-events-none scale-95 md:opacity-100 md:pointer-events-auto md:scale-100'
+      }`}>
         <div className="p-4 rounded-xl border border-[#20242e] bg-[#12141a]/95 backdrop-blur-md shadow-2xl space-y-3">
           <div className="flex items-center justify-between border-b border-[#20242e] pb-2">
             <div className="flex items-center gap-2">
@@ -88,7 +108,7 @@ export const SkeletonPage: React.FC = () => {
                 <Split className="w-3.5 h-3.5 text-amber-500" />
                 Explode Skeleton:
               </span>
-              <span className="text-amber-400 font-mono">{Math.round(explodeFactor * 100)}%</span>
+              <span className="text-amber-400 font-mono font-bold">{Math.round(explodeFactor * 100)}%</span>
             </div>
             <input
               type="range"
@@ -97,7 +117,10 @@ export const SkeletonPage: React.FC = () => {
               step="0.05"
               value={explodeFactor}
               onChange={(e) => setExplodeFactor(parseFloat(e.target.value))}
-              className="w-full accent-amber-500 h-1.5 bg-[#181b22] rounded-lg cursor-pointer"
+              onTouchStart={(e) => e.stopPropagation()}
+              onTouchMove={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
+              className="w-full accent-amber-500 h-2 bg-[#181b22] rounded-lg cursor-pointer touch-none"
             />
           </div>
 
@@ -106,7 +129,10 @@ export const SkeletonPage: React.FC = () => {
             {bones.map((bone) => (
               <button
                 key={bone.slug}
-                onClick={() => setSelectedBoneId(bone.slug)}
+                onClick={() => {
+                  setSelectedBoneId(bone.slug);
+                  if (window.innerWidth < 768) setPanelOpen(false);
+                }}
                 className={`w-full text-left p-2 rounded-lg text-xs transition-colors flex items-center justify-between border ${
                   selectedBoneId === bone.slug
                     ? 'bg-amber-500/15 text-amber-300 border-amber-500/40 shadow-sm font-medium'
@@ -146,15 +172,10 @@ export const SkeletonPage: React.FC = () => {
             />
           </Suspense>
 
-          <OrbitControls
-            enableDamping
-            dampingFactor={0.12}
-            rotateSpeed={0.38}
-            zoomSpeed={0.28}
-            panSpeed={0.4}
-            minDistance={1.2}
-            maxDistance={8.5}
-            makeDefault
+          <CameraControls
+            preset={cameraPreset}
+            distance={4.8}
+            target={[0, 0, 0]}
           />
         </Canvas>
 

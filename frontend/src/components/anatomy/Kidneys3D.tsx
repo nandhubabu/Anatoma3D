@@ -1,7 +1,8 @@
 import React, { useRef, useMemo } from 'react';
-import { useGLTF, Html } from '@react-three/drei';
+import { useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import { ExplorationMode, CuttingPlaneConfig } from '../../types/anatomy';
+import { AnatomicalLeaderLabel } from './AnatomicalLeaderLabel';
 
 interface Kidneys3DProps {
   mode: ExplorationMode;
@@ -265,26 +266,17 @@ export const Kidneys3D: React.FC<Kidneys3DProps> = ({
                 />
               </mesh>
 
-              {/* 3D Anatomical Label */}
+              {/* 3D Anatomical Label with Leader Line */}
               {showLabels && (explodeFactor > 0.35 || isSelected || isHovered) && (
-                <Html
+                <AnatomicalLeaderLabel
+                  name={cfg.name}
+                  isSelected={isSelected}
+                  isHovered={isHovered}
                   position={cfg.labelPos}
-                  center
+                  direction={cfg.labelPos[0] >= 0 ? 'right' : 'left'}
                   distanceFactor={6}
-                  style={{ pointerEvents: 'none' }}
-                >
-                  <div
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-semibold whitespace-nowrap backdrop-blur-md transition-all border ${
-                      isSelected
-                        ? 'bg-amber-500 text-black font-bold border-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.5)] scale-110'
-                        : isHovered
-                        ? 'bg-[#1e222d] text-amber-300 border-amber-500/50 scale-105'
-                        : 'bg-[#0d0f14]/90 text-[#d1d5db] border-[#20242e] shadow-md'
-                    }`}
-                  >
-                    {cfg.name}
-                  </div>
-                </Html>
+                  onClick={() => onSelectStructure?.(cfg.id)}
+                />
               )}
             </group>
           );

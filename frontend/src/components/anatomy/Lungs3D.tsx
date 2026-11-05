@@ -1,8 +1,9 @@
 import React, { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { useGLTF, Html } from '@react-three/drei';
+import { useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import { ExplorationMode, CuttingPlaneConfig } from '../../types/anatomy';
+import { AnatomicalLeaderLabel } from './AnatomicalLeaderLabel';
 
 interface Lungs3DProps {
   mode: ExplorationMode;
@@ -192,29 +193,16 @@ export const Lungs3D: React.FC<Lungs3DProps> = ({
             const posZ = part.labelPos[2] + part.explodeDir[2] * explodeFactor * 0.6;
 
             return (
-              <Html
+              <AnatomicalLeaderLabel
                 key={part.id}
+                name={part.name}
+                isSelected={isSelected}
+                isHovered={isHovered}
                 position={[posX, posY, posZ]}
-                center
+                direction={posX >= 0 ? 'right' : 'left'}
                 distanceFactor={7}
-                style={{ pointerEvents: 'none' }}
-              >
-                <div
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSelectStructure?.(part.id);
-                  }}
-                  className={`px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap backdrop-blur-md transition-all border pointer-events-auto cursor-pointer ${
-                    isSelected
-                      ? 'bg-amber-500 text-black font-bold border-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.5)] scale-110'
-                      : isHovered
-                      ? 'bg-[#1e222d] text-amber-300 border-amber-500/50 scale-105'
-                      : 'bg-[#0d0f14]/90 text-[#d1d5db] border-[#20242e] shadow-md hover:border-amber-500/40'
-                  }`}
-                >
-                  {part.name}
-                </div>
-              </Html>
+                onClick={() => onSelectStructure?.(part.id)}
+              />
             );
           })}
         </group>

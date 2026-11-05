@@ -122,7 +122,12 @@ export const OrganDetails: React.FC = () => {
   const [showLabels, setShowLabels] = useState<boolean>(true);
   const [cameraPreset, setCameraPreset] = useState<CameraPreset>('isometric');
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
-  const [infoPanelOpen, setInfoPanelOpen] = useState<boolean>(true);
+  const [infoPanelOpen, setInfoPanelOpen] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth >= 1024;
+    }
+    return true;
+  });
 
   // Selection & Hover
   const [selectedSubId, setSelectedSubId] = useState<string | undefined>(highlightParam || undefined);
@@ -408,28 +413,25 @@ export const OrganDetails: React.FC = () => {
           />
         </Canvas>
 
-        {/* Live Cursor Hover HUD Tooltip (surgical feedback) */}
+        {/* Live Cursor Hover HUD Tooltip (Discreet top-left diagnostic readout) */}
         {hoveredSubcomponent && (
-          <div className="absolute top-4 right-4 sm:right-6 pointer-events-none z-30 animate-in fade-in duration-150">
-            <div className="px-3.5 py-2 rounded-xl bg-[#12141c]/95 border border-[#272c3b] shadow-2xl backdrop-blur-xl max-w-sm">
-              <div className="flex items-center gap-2 mb-0.5">
-                <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-                <span className="text-xs font-bold text-white">{hoveredSubcomponent.name}</span>
+          <div className="absolute top-3 left-3 sm:top-4 sm:left-4 pointer-events-none z-30 animate-in fade-in duration-150">
+            <div className="px-3 py-1.5 rounded-xl bg-[#0e1017]/95 border border-[#232736] shadow-xl backdrop-blur-md flex items-center gap-2 max-w-xs">
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0" />
+              <div className="min-w-0">
+                <div className="text-xs font-bold text-white truncate">{hoveredSubcomponent.name}</div>
+                {hoveredSubcomponent.latinName && (
+                  <div className="text-[10px] text-amber-400 font-serif italic truncate">
+                    {hoveredSubcomponent.latinName}
+                  </div>
+                )}
               </div>
-              {hoveredSubcomponent.latinName && (
-                <div className="text-[11px] text-amber-300 font-serif italic mb-1">
-                  {hoveredSubcomponent.latinName}
-                </div>
-              )}
-              <p className="text-[11px] text-slate-300 line-clamp-2 leading-tight">
-                {hoveredSubcomponent.function}
-              </p>
             </div>
           </div>
         )}
 
         {/* Floating Bottom Multi-tool HUD */}
-        <div className="absolute bottom-5 left-4 right-4 z-30 pointer-events-auto">
+        <div className="absolute bottom-3 sm:bottom-5 left-2 sm:left-4 right-2 sm:right-4 z-30 pointer-events-auto">
           <OrganToolbar
             mode={mode}
             onSetMode={handleSetMode}
