@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-dark: #0a0b0e;
+    --bg-surface: #12141a;
+    --bg-elevated: #181b22;
+    --border-subtle: #20242e;
+    --border-active: #f59e0b;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --accent-amber: #f59e0b;
+    --accent-emerald: #10b981;
+    --accent-crimson: #ef4444;
+    --accent-cyan: #06b6d4;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: #090a0d;
+    color: #f1f5f9;
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* Custom Precision Studio Scrollbars */
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0d0f14;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #232733;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #363c4e;
+  }
+}
+
+/* Minimalist Precision Obsidian Surfaces (No purple/blue glassmorphism) */
+.obsidian-panel {
+  background: #101217;
+  border: 1px solid #1f232d;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+}
+
+.obsidian-deck {
+  background: rgba(14, 16, 21, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid #232733;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+}
+
+.obsidian-pill {
+  background: #161820;
+  border: 1px solid #242936;
+  color: #e2e8f0;
+  transition: all 0.15s ease;
+}
+
+.obsidian-pill:hover {
+  background: #1e222d;
+  border-color: #3b4255;
+  color: #ffffff;
+}
+
+.obsidian-pill-active {
+  background: #232734;
+  border-color: #f59e0b;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+}
+
+/* Clean High-Contrast Badges */
+.badge-amber {
+  background: rgba(245, 158, 11, 0.12);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badge-emerald {
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge-crimson {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Backward compatibility aliases mapping to the clean obsidian surfaces */
+.glass-panel {
+  background: rgba(14, 16, 21, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid #222632;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.glass-panel-subtle {
+  background: #111318;
+  border: 1px solid #1c202a;
+}
+
+.glass-panel-active {
+  background: #1a1e28;
+  border: 1px solid #f59e0b;
+}
