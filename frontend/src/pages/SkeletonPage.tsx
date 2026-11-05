@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
@@ -10,6 +10,7 @@ import {
   Tag
 } from 'lucide-react';
 import { SkeletonViewer } from '../components/anatomy/SkeletonViewer';
+import { ModelLoader } from '../components/anatomy/ModelLoader';
 import { BoneStructureData } from '../types/anatomy';
 import { anatomyApi } from '../services/anatomyApi';
 
@@ -133,15 +134,17 @@ export const SkeletonPage: React.FC = () => {
           <directionalLight position={[6, 8, 6]} intensity={1.8} castShadow />
           <directionalLight position={[-6, -4, -4]} intensity={0.6} color="#fffcf5" />
 
-          <SkeletonViewer
-            selectedBone={selectedBoneId}
-            onSelectBone={setSelectedBoneId}
-            hoveredBone={hoveredBoneId}
-            onHoverBone={setHoveredBoneId}
-            filterRegion={filterRegion}
-            explodeFactor={explodeFactor}
-            showLabels={showLabels}
-          />
+          <Suspense fallback={<ModelLoader />}>
+            <SkeletonViewer
+              selectedBone={selectedBoneId}
+              onSelectBone={setSelectedBoneId}
+              hoveredBone={hoveredBoneId}
+              onHoverBone={setHoveredBoneId}
+              filterRegion={filterRegion}
+              explodeFactor={explodeFactor}
+              showLabels={showLabels}
+            />
+          </Suspense>
 
           <OrbitControls
             enableDamping

@@ -13,12 +13,15 @@ export default defineConfig({
     port: 5173
   },
   build: {
-    chunkSizeWarningLimit: 1200,
+    chunkSizeWarningLimit: 1500,
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes('node_modules/three')) {
-            return 'three-vendor';
+          if (id.includes('node_modules/three-stdlib')) {
+            return 'three-stdlib';
+          }
+          if (id.includes('node_modules/three/') || id.endsWith('node_modules/three')) {
+            return 'three-core';
           }
           if (id.includes('node_modules/@react-three')) {
             return 'r3f-vendor';

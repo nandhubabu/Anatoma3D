@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
+import { OrbitControls, useGLTF } from '@react-three/drei';
 import {
   Heart,
   Brain,
@@ -26,8 +26,16 @@ import { Kidneys3D } from '../components/anatomy/Kidneys3D';
 import { Stomach3D } from '../components/anatomy/Stomach3D';
 import { MuscleViewer } from '../components/anatomy/MuscleViewer';
 import { SkeletonViewer } from '../components/anatomy/SkeletonViewer';
+import { ModelLoader } from '../components/anatomy/ModelLoader';
 import { BodySystemData } from '../types/anatomy';
 import { anatomyApi } from '../services/anatomyApi';
+
+// Preload primary hero model for instantaneous rendering
+try {
+  useGLTF.preload('/models/heart_hubmap.glb');
+} catch (e) {
+  // Silent fail if offline or running in mock env
+}
 
 type ShowcaseTab = 'heart' | 'brain' | 'lungs' | 'kidneys' | 'stomach' | 'muscles' | 'skeleton';
 
@@ -223,68 +231,70 @@ export const Home: React.FC = () => {
                     <directionalLight position={[-6, -2, -4]} intensity={0.7} color="#fffcf5" />
                     <pointLight position={[0, 5, 2]} intensity={0.5} color="#ffffff" />
 
-                    {showcaseTab === 'heart' && (
-                      <Heart3D
-                        mode="external"
-                        cuttingConfig={{ active: false, axis: 'x', position: 0, invert: false }}
-                        explodeFactor={0}
-                        isBeating={activeHeartBeating}
-                        beatSpeed={1.0}
-                        showBloodFlow={true}
-                        showLabels={false}
-                      />
-                    )}
+                    <Suspense fallback={<ModelLoader />}>
+                      {showcaseTab === 'heart' && (
+                        <Heart3D
+                          mode="external"
+                          cuttingConfig={{ active: false, axis: 'x', position: 0, invert: false }}
+                          explodeFactor={0}
+                          isBeating={activeHeartBeating}
+                          beatSpeed={1.0}
+                          showBloodFlow={true}
+                          showLabels={false}
+                        />
+                      )}
 
-                    {showcaseTab === 'brain' && (
-                      <Brain3D
-                        mode="external"
-                        cuttingConfig={{ active: false, axis: 'x', position: 0, invert: false }}
-                        explodeFactor={0}
-                        showLabels={false}
-                      />
-                    )}
+                      {showcaseTab === 'brain' && (
+                        <Brain3D
+                          mode="external"
+                          cuttingConfig={{ active: false, axis: 'x', position: 0, invert: false }}
+                          explodeFactor={0}
+                          showLabels={false}
+                        />
+                      )}
 
-                    {showcaseTab === 'lungs' && (
-                      <Lungs3D
-                        mode="external"
-                        cuttingConfig={{ active: false, axis: 'x', position: 0, invert: false }}
-                        explodeFactor={0}
-                        showLabels={false}
-                      />
-                    )}
+                      {showcaseTab === 'lungs' && (
+                        <Lungs3D
+                          mode="external"
+                          cuttingConfig={{ active: false, axis: 'x', position: 0, invert: false }}
+                          explodeFactor={0}
+                          showLabels={false}
+                        />
+                      )}
 
-                    {showcaseTab === 'kidneys' && (
-                      <Kidneys3D
-                        mode="external"
-                        cuttingConfig={{ active: false, axis: 'x', position: 0, invert: false }}
-                        explodeFactor={0}
-                        showLabels={false}
-                      />
-                    )}
+                      {showcaseTab === 'kidneys' && (
+                        <Kidneys3D
+                          mode="external"
+                          cuttingConfig={{ active: false, axis: 'x', position: 0, invert: false }}
+                          explodeFactor={0}
+                          showLabels={false}
+                        />
+                      )}
 
-                    {showcaseTab === 'stomach' && (
-                      <Stomach3D
-                        mode="external"
-                        cuttingConfig={{ active: false, axis: 'x', position: 0, invert: false }}
-                        explodeFactor={0}
-                        showLabels={false}
-                      />
-                    )}
+                      {showcaseTab === 'stomach' && (
+                        <Stomach3D
+                          mode="external"
+                          cuttingConfig={{ active: false, axis: 'x', position: 0, invert: false }}
+                          explodeFactor={0}
+                          showLabels={false}
+                        />
+                      )}
 
-                    {showcaseTab === 'muscles' && (
-                      <MuscleViewer
-                        isContracting={true}
-                        showLabels={false}
-                      />
-                    )}
+                      {showcaseTab === 'muscles' && (
+                        <MuscleViewer
+                          isContracting={true}
+                          showLabels={false}
+                        />
+                      )}
 
-                    {showcaseTab === 'skeleton' && (
-                      <SkeletonViewer
-                        filterRegion="all"
-                        explodeFactor={0}
-                        showLabels={false}
-                      />
-                    )}
+                      {showcaseTab === 'skeleton' && (
+                        <SkeletonViewer
+                          filterRegion="all"
+                          explodeFactor={0}
+                          showLabels={false}
+                        />
+                      )}
+                    </Suspense>
 
                     <OrbitControls
                       enableDamping

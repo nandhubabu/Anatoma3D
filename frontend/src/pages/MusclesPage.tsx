@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
@@ -9,6 +9,7 @@ import {
   Tag
 } from 'lucide-react';
 import { MuscleViewer } from '../components/anatomy/MuscleViewer';
+import { ModelLoader } from '../components/anatomy/ModelLoader';
 import { MuscleStructureData } from '../types/anatomy';
 import { anatomyApi } from '../services/anatomyApi';
 
@@ -125,15 +126,17 @@ export const MusclesPage: React.FC = () => {
           <directionalLight position={[6, 10, 6]} intensity={1.8} castShadow color="#ffffff" />
           <directionalLight position={[-6, -2, -4]} intensity={0.65} color="#fffcf5" />
 
-          <MuscleViewer
-            selectedMuscle={selectedMuscleId}
-            onSelectMuscle={setSelectedMuscleId}
-            hoveredMuscle={hoveredMuscleId}
-            onHoverMuscle={setHoveredMuscleId}
-            layerFilter={layerFilter}
-            isContracting={isContracting}
-            showLabels={showLabels}
-          />
+          <Suspense fallback={<ModelLoader />}>
+            <MuscleViewer
+              selectedMuscle={selectedMuscleId}
+              onSelectMuscle={setSelectedMuscleId}
+              hoveredMuscle={hoveredMuscleId}
+              onHoverMuscle={setHoveredMuscleId}
+              layerFilter={layerFilter}
+              isContracting={isContracting}
+              showLabels={showLabels}
+            />
+          </Suspense>
 
           <OrbitControls
             enableDamping

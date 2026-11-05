@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Canvas } from '@react-three/fiber';
 import {
@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { HumanBodyViewer } from '../components/anatomy/HumanBodyViewer';
 import { CameraControls } from '../components/anatomy/CameraControls';
+import { ModelLoader } from '../components/anatomy/ModelLoader';
 import { LayerVisibility, CameraPreset } from '../types/anatomy';
 
 const BODY_TARGET: [number, number, number] = [0, 0, 0];
@@ -169,14 +170,16 @@ export const ExploreBody: React.FC = () => {
           <directionalLight position={[-6, -2, -4]} intensity={0.65} color="#fffcf5" />
           <pointLight position={[0, 4, 3]} intensity={0.5} color="#ffffff" />
 
-          <HumanBodyViewer
-            layers={layers}
-            selectedStructure={selectedId}
-            onSelectStructure={handleSelectStructure}
-            hoveredStructure={hoveredId}
-            onHoverStructure={setHoveredId}
-            gender={gender}
-          />
+          <Suspense fallback={<ModelLoader />}>
+            <HumanBodyViewer
+              layers={layers}
+              selectedStructure={selectedId}
+              onSelectStructure={handleSelectStructure}
+              hoveredStructure={hoveredId}
+              onHoverStructure={setHoveredId}
+              gender={gender}
+            />
+          </Suspense>
 
           <CameraControls
             preset={cameraPreset}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, Suspense } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { Canvas } from '@react-three/fiber';
 import {
@@ -21,6 +21,7 @@ import { OrganToolbar } from '../components/interface/OrganToolbar';
 import { OrganInfoPanel } from '../components/interface/OrganInfoPanel';
 import { CameraControls } from '../components/anatomy/CameraControls';
 import { AnatomicalPins } from '../components/anatomy/AnatomicalPins';
+import { ModelLoader } from '../components/anatomy/ModelLoader';
 import {
   ExplorationMode,
   CuttingPlaneConfig,
@@ -288,103 +289,105 @@ export const OrganDetails: React.FC = () => {
           <pointLight position={[0, 5, 2]} intensity={0.5} color="#ffffff" />
 
           {/* Render corresponding 3D organ */}
-          {slug === 'heart' ? (
-            <Heart3D
-              mode={mode}
-              selectedStructureId={selectedSubId}
-              onSelectStructure={setSelectedSubId}
-              hoveredStructureId={hoveredSubId || undefined}
-              onHoverStructure={setHoveredSubId}
-              cuttingConfig={cuttingConfig}
-              explodeFactor={explodeFactor}
-              isBeating={isBeating}
-              beatSpeed={beatSpeed}
-              showBloodFlow={showBloodFlow}
-              showLabels={showLabels}
-              isolateMode={isolateMode}
-              xrayOpacity={xrayOpacity}
-            />
-          ) : slug === 'brain' ? (
-            <Brain3D
-              mode={mode}
-              selectedStructureId={selectedSubId}
-              onSelectStructure={setSelectedSubId}
-              hoveredStructureId={hoveredSubId || undefined}
-              onHoverStructure={setHoveredSubId}
-              cuttingConfig={cuttingConfig}
-              explodeFactor={explodeFactor}
-              showLabels={showLabels}
-              isolateMode={isolateMode}
-              xrayOpacity={xrayOpacity}
-            />
-          ) : slug === 'lungs' ? (
-            <Lungs3D
-              mode={mode}
-              selectedStructureId={selectedSubId}
-              onSelectStructure={setSelectedSubId}
-              hoveredStructureId={hoveredSubId || undefined}
-              onHoverStructure={setHoveredSubId}
-              cuttingConfig={cuttingConfig}
-              explodeFactor={explodeFactor}
-              showLabels={showLabels}
-              isolateMode={isolateMode}
-              xrayOpacity={xrayOpacity}
-            />
-          ) : slug === 'kidneys' ? (
-            <Kidneys3D
-              mode={mode}
-              selectedStructureId={selectedSubId}
-              onSelectStructure={setSelectedSubId}
-              hoveredStructureId={hoveredSubId || undefined}
-              onHoverStructure={setHoveredSubId}
-              cuttingConfig={cuttingConfig}
-              explodeFactor={explodeFactor}
-              showLabels={showLabels}
-              isolateMode={isolateMode}
-              xrayOpacity={xrayOpacity}
-            />
-          ) : slug === 'stomach' ? (
-            <Stomach3D
-              mode={mode}
-              selectedStructureId={selectedSubId}
-              onSelectStructure={setSelectedSubId}
-              hoveredStructureId={hoveredSubId || undefined}
-              onHoverStructure={setHoveredSubId}
-              cuttingConfig={cuttingConfig}
-              explodeFactor={explodeFactor}
-              showLabels={showLabels}
-              isolateMode={isolateMode}
-              xrayOpacity={xrayOpacity}
-            />
-          ) : slug === 'liver' ? (
-            <Liver3D
-              mode={mode}
-              selectedStructureId={selectedSubId}
-              onSelectStructure={setSelectedSubId}
-              hoveredStructureId={hoveredSubId || undefined}
-              onHoverStructure={setHoveredSubId}
-              cuttingConfig={cuttingConfig}
-              explodeFactor={explodeFactor}
-              showLabels={showLabels}
-              isolateMode={isolateMode}
-              xrayOpacity={xrayOpacity}
-            />
-          ) : (
-            <GenericOrgan3D
-              slug={slug}
-              subcomponents={organ.subcomponents}
-              mode={mode}
-              selectedStructureId={selectedSubId}
-              onSelectStructure={setSelectedSubId}
-              hoveredStructureId={hoveredSubId || undefined}
-              onHoverStructure={setHoveredSubId}
-              cuttingConfig={cuttingConfig}
-              explodeFactor={explodeFactor}
-              showLabels={showLabels}
-              isolateMode={isolateMode}
-              xrayOpacity={xrayOpacity}
-            />
-          )}
+          <Suspense fallback={<ModelLoader />}>
+            {slug === 'heart' ? (
+              <Heart3D
+                mode={mode}
+                selectedStructureId={selectedSubId}
+                onSelectStructure={setSelectedSubId}
+                hoveredStructureId={hoveredSubId || undefined}
+                onHoverStructure={setHoveredSubId}
+                cuttingConfig={cuttingConfig}
+                explodeFactor={explodeFactor}
+                isBeating={isBeating}
+                beatSpeed={beatSpeed}
+                showBloodFlow={showBloodFlow}
+                showLabels={showLabels}
+                isolateMode={isolateMode}
+                xrayOpacity={xrayOpacity}
+              />
+            ) : slug === 'brain' ? (
+              <Brain3D
+                mode={mode}
+                selectedStructureId={selectedSubId}
+                onSelectStructure={setSelectedSubId}
+                hoveredStructureId={hoveredSubId || undefined}
+                onHoverStructure={setHoveredSubId}
+                cuttingConfig={cuttingConfig}
+                explodeFactor={explodeFactor}
+                showLabels={showLabels}
+                isolateMode={isolateMode}
+                xrayOpacity={xrayOpacity}
+              />
+            ) : slug === 'lungs' ? (
+              <Lungs3D
+                mode={mode}
+                selectedStructureId={selectedSubId}
+                onSelectStructure={setSelectedSubId}
+                hoveredStructureId={hoveredSubId || undefined}
+                onHoverStructure={setHoveredSubId}
+                cuttingConfig={cuttingConfig}
+                explodeFactor={explodeFactor}
+                showLabels={showLabels}
+                isolateMode={isolateMode}
+                xrayOpacity={xrayOpacity}
+              />
+            ) : slug === 'kidneys' ? (
+              <Kidneys3D
+                mode={mode}
+                selectedStructureId={selectedSubId}
+                onSelectStructure={setSelectedSubId}
+                hoveredStructureId={hoveredSubId || undefined}
+                onHoverStructure={setHoveredSubId}
+                cuttingConfig={cuttingConfig}
+                explodeFactor={explodeFactor}
+                showLabels={showLabels}
+                isolateMode={isolateMode}
+                xrayOpacity={xrayOpacity}
+              />
+            ) : slug === 'stomach' ? (
+              <Stomach3D
+                mode={mode}
+                selectedStructureId={selectedSubId}
+                onSelectStructure={setSelectedSubId}
+                hoveredStructureId={hoveredSubId || undefined}
+                onHoverStructure={setHoveredSubId}
+                cuttingConfig={cuttingConfig}
+                explodeFactor={explodeFactor}
+                showLabels={showLabels}
+                isolateMode={isolateMode}
+                xrayOpacity={xrayOpacity}
+              />
+            ) : slug === 'liver' ? (
+              <Liver3D
+                mode={mode}
+                selectedStructureId={selectedSubId}
+                onSelectStructure={setSelectedSubId}
+                hoveredStructureId={hoveredSubId || undefined}
+                onHoverStructure={setHoveredSubId}
+                cuttingConfig={cuttingConfig}
+                explodeFactor={explodeFactor}
+                showLabels={showLabels}
+                isolateMode={isolateMode}
+                xrayOpacity={xrayOpacity}
+              />
+            ) : (
+              <GenericOrgan3D
+                slug={slug}
+                subcomponents={organ.subcomponents}
+                mode={mode}
+                selectedStructureId={selectedSubId}
+                onSelectStructure={setSelectedSubId}
+                hoveredStructureId={hoveredSubId || undefined}
+                onHoverStructure={setHoveredSubId}
+                cuttingConfig={cuttingConfig}
+                explodeFactor={explodeFactor}
+                showLabels={showLabels}
+                isolateMode={isolateMode}
+                xrayOpacity={xrayOpacity}
+              />
+            )}
+          </Suspense>
 
           {/* Interactive 3D Landmark Pins */}
           {showPins && (
