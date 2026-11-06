@@ -21,7 +21,7 @@ export const SkeletonPage: React.FC = () => {
   const initialBoneParam = searchParams.get('bone');
 
   const [bones, setBones] = useState<BoneStructureData[]>([]);
-  const [selectedBoneId, setSelectedBoneId] = useState<string | null>(initialBoneParam || 'femur');
+  const [selectedBoneId, setSelectedBoneId] = useState<string | null>(initialBoneParam || null);
   const [hoveredBoneId, setHoveredBoneId] = useState<string | null>(null);
   const [filterRegion, setFilterRegion] = useState<'all' | 'axial' | 'appendicular'>('all');
   const [explodeFactor, setExplodeFactor] = useState<number>(0);
@@ -195,9 +195,9 @@ export const SkeletonPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Right Selected Bone Inspector Panel */}
+      {/* Desktop Selected Bone Inspector Panel */}
       {selectedBone && (
-        <aside className="w-80 shrink-0 border-l border-[#20242e] bg-[#0d0f14]/98 p-5 overflow-y-auto space-y-4 shadow-2xl custom-scrollbar z-20">
+        <aside className="hidden md:block w-80 shrink-0 border-l border-[#20242e] bg-[#0d0f14]/98 p-5 overflow-y-auto space-y-4 shadow-2xl custom-scrollbar z-20">
           <div>
             <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-[#181b22] text-amber-400 border border-amber-500/30">
               {selectedBone.region} Skeleton • {selectedBone.category} Bone
@@ -276,6 +276,27 @@ export const SkeletonPage: React.FC = () => {
             </div>
           )}
         </aside>
+      )}
+
+      {/* Mobile Selected Bone Bottom Sheet (< md) */}
+      {selectedBone && (
+        <div className="md:hidden fixed inset-x-0 bottom-0 z-40 bg-[#101218]/98 border-t border-[#232736] rounded-t-3xl p-4 shadow-2xl max-h-[60vh] overflow-y-auto space-y-3 animate-in slide-in-from-bottom duration-200 backdrop-blur-xl">
+          <div className="flex items-center justify-between pb-2 border-b border-[#1f232d]">
+            <div>
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-[#181b22] text-amber-400 border border-amber-500/30">
+                {selectedBone.region} • {selectedBone.category}
+              </span>
+              <h3 className="text-base font-bold text-white mt-1">{selectedBone.name}</h3>
+            </div>
+            <button
+              onClick={() => setSelectedBoneId(null)}
+              className="p-1.5 rounded-xl bg-[#181b24] border border-[#272c3b] text-slate-400 hover:text-white"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <p className="text-xs text-[#d1d5db] leading-relaxed">{selectedBone.primary_function}</p>
+        </div>
       )}
     </div>
   );

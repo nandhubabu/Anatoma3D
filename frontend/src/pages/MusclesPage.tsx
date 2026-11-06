@@ -21,7 +21,7 @@ export const MusclesPage: React.FC = () => {
   const initialMuscleParam = searchParams.get('muscle');
 
   const [muscles, setMuscles] = useState<MuscleStructureData[]>([]);
-  const [selectedMuscleId, setSelectedMuscleId] = useState<string | null>(initialMuscleParam || 'biceps_brachii');
+  const [selectedMuscleId, setSelectedMuscleId] = useState<string | null>(initialMuscleParam || null);
   const [hoveredMuscleId, setHoveredMuscleId] = useState<string | null>(null);
   const [layerFilter, setLayerFilter] = useState<'all' | 'superficial' | 'deep'>('all');
   const [isContracting, setIsContracting] = useState<boolean>(true);
@@ -185,9 +185,9 @@ export const MusclesPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Right Selected Muscle Inspector Panel */}
+      {/* Desktop Selected Muscle Inspector Panel */}
       {selectedMuscle && (
-        <aside className="w-80 shrink-0 border-l border-[#20242e] bg-[#0d0f14]/98 p-5 overflow-y-auto space-y-4 shadow-2xl custom-scrollbar z-20">
+        <aside className="hidden md:block w-80 shrink-0 border-l border-[#20242e] bg-[#0d0f14]/98 p-5 overflow-y-auto space-y-4 shadow-2xl custom-scrollbar z-20">
           <div>
             <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-[#181b22] text-rose-400 border border-rose-500/30">
               {selectedMuscle.region} • {selectedMuscle.layer} layer
@@ -244,6 +244,27 @@ export const MusclesPage: React.FC = () => {
             </p>
           </div>
         </aside>
+      )}
+
+      {/* Mobile Selected Muscle Bottom Sheet (< md) */}
+      {selectedMuscle && (
+        <div className="md:hidden fixed inset-x-0 bottom-0 z-40 bg-[#101218]/98 border-t border-[#232736] rounded-t-3xl p-4 shadow-2xl max-h-[60vh] overflow-y-auto space-y-3 animate-in slide-in-from-bottom duration-200 backdrop-blur-xl">
+          <div className="flex items-center justify-between pb-2 border-b border-[#1f232d]">
+            <div>
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-[#181b22] text-rose-400 border border-rose-500/30">
+                {selectedMuscle.region} • {selectedMuscle.layer} layer
+              </span>
+              <h3 className="text-base font-bold text-white mt-1">{selectedMuscle.name}</h3>
+            </div>
+            <button
+              onClick={() => setSelectedMuscleId(null)}
+              className="p-1.5 rounded-xl bg-[#181b24] border border-[#272c3b] text-slate-400 hover:text-white"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <p className="text-xs text-[#d1d5db] leading-relaxed">{selectedMuscle.action}</p>
+        </div>
       )}
     </div>
   );

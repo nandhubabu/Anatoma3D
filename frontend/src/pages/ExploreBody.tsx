@@ -6,7 +6,9 @@ import {
   Eye,
   RotateCcw,
   Compass,
-  ArrowRight
+  ArrowRight,
+  X,
+  ChevronDown
 } from 'lucide-react';
 import { HumanBodyViewer } from '../components/anatomy/HumanBodyViewer';
 import { CameraControls } from '../components/anatomy/CameraControls';
@@ -33,6 +35,8 @@ export const ExploreBody: React.FC = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<'organ' | 'system' | 'bone' | 'muscle' | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [mobileLayersOpen, setMobileLayersOpen] = useState<boolean>(false);
+  const [viewsMenuOpen, setViewsMenuOpen] = useState<boolean>(false);
 
   const toggleLayer = (layer: keyof LayerVisibility) => {
     setLayers((prev) => ({ ...prev, [layer]: !prev[layer] }));
@@ -58,8 +62,8 @@ export const ExploreBody: React.FC = () => {
 
   return (
     <div className="relative w-full h-[calc(100vh-4rem)] bg-[#090a0d] overflow-hidden flex">
-      {/* Left Layer Visibility & Filters Floating Panel */}
-      <div className="absolute top-4 left-4 z-20 flex flex-col gap-2 max-w-xs">
+      {/* Desktop Layer Visibility & Filters Floating Panel (Hidden on Mobile) */}
+      <div className="hidden md:flex absolute top-4 left-4 z-20 flex-col gap-2 max-w-xs">
         <div className="p-4 rounded-2xl border border-[#222633] bg-[#12141b]/95 backdrop-blur-xl shadow-2xl space-y-3">
           <div className="flex items-center justify-between border-b border-[#1f232d] pb-2">
             <div className="flex items-center gap-2">
@@ -190,7 +194,7 @@ export const ExploreBody: React.FC = () => {
 
         {/* Selected Structure Info Overlay Card */}
         {selectedId && (
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 w-full max-w-md px-4">
+          <div className="absolute bottom-20 inset-x-3 md:bottom-6 md:left-1/2 md:-translate-x-1/2 z-30 w-auto md:max-w-md md:w-full">
             <div className="p-4 rounded-2xl border border-[#272c3b] bg-[#12141c]/95 shadow-2xl backdrop-blur-xl flex items-center justify-between gap-4 animate-fadeIn">
               <div>
                 <div className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">
@@ -224,8 +228,8 @@ export const ExploreBody: React.FC = () => {
           </div>
         )}
 
-        {/* View Presets HUD Bar */}
-        <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5 p-1.5 rounded-xl border border-[#232733] bg-[#12141c]/90 backdrop-blur-md text-xs text-slate-300">
+        {/* Desktop View Presets HUD Bar (Hidden on Mobile) */}
+        <div className="hidden md:flex absolute top-4 right-4 z-20 items-center gap-1.5 p-1.5 rounded-xl border border-[#232733] bg-[#12141c]/90 backdrop-blur-md text-xs text-slate-300">
           <Compass className="w-3.5 h-3.5 text-amber-400 ml-1.5 mr-1" />
           <button
             onClick={() => setCameraPreset('front')}
@@ -259,8 +263,193 @@ export const ExploreBody: React.FC = () => {
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
         </div>
+
+        {/* Mobile Floating Bottom Controls Bar (< md) */}
+        <div className="md:hidden absolute bottom-4 inset-x-3 z-30 flex items-center justify-between gap-2 pointer-events-auto">
+          <button
+            onClick={() => setMobileLayersOpen(true)}
+            className="flex-1 py-2.5 px-3 rounded-2xl bg-[#12141c]/95 border border-[#272c3b] text-xs font-semibold text-white flex items-center justify-center gap-1.5 shadow-2xl backdrop-blur-xl"
+          >
+            <Layers className="w-4 h-4 text-amber-400" />
+            <span>Layers ({Object.values(layers).filter(Boolean).length}/6)</span>
+          </button>
+
+          <button
+            onClick={() => setGender(gender === 'male' ? 'female' : 'male')}
+            className="py-2.5 px-3 rounded-2xl bg-[#12141c]/95 border border-[#272c3b] text-xs font-semibold text-amber-300 shadow-2xl backdrop-blur-xl flex items-center gap-1"
+          >
+            <span>{gender === 'male' ? '♂ Male' : '♀ Female'}</span>
+          </button>
+
+          <div className="relative">
+            <button
+              onClick={() => setViewsMenuOpen(!viewsMenuOpen)}
+              className="py-2.5 px-3 rounded-2xl bg-[#12141c]/95 border border-[#272c3b] text-xs font-semibold text-slate-200 flex items-center gap-1.5 shadow-2xl backdrop-blur-xl"
+            >
+              <Compass className="w-4 h-4 text-amber-400" />
+              <span>Views</span>
+              <ChevronDown className="w-3 h-3 text-slate-400" />
+            </button>
+
+            {viewsMenuOpen && (
+              <div
+                className="absolute right-0 bottom-full mb-2 bg-[#12141c] border border-[#242835] rounded-2xl shadow-2xl p-1.5 flex flex-col gap-1 min-w-[140px] backdrop-blur-xl z-50 text-xs"
+                onClick={() => setViewsMenuOpen(false)}
+              >
+                <button
+                  onClick={() => setCameraPreset('front')}
+                  className="px-3 py-1.5 rounded-xl text-left text-slate-300 hover:bg-[#1a1d26] hover:text-white font-medium"
+                >
+                  Anterior (Front)
+                </button>
+                <button
+                  onClick={() => setCameraPreset('back')}
+                  className="px-3 py-1.5 rounded-xl text-left text-slate-300 hover:bg-[#1a1d26] hover:text-white font-medium"
+                >
+                  Posterior (Back)
+                </button>
+                <button
+                  onClick={() => setCameraPreset('left')}
+                  className="px-3 py-1.5 rounded-xl text-left text-slate-300 hover:bg-[#1a1d26] hover:text-white font-medium"
+                >
+                  Left Lateral
+                </button>
+                <button
+                  onClick={() => setCameraPreset('right')}
+                  className="px-3 py-1.5 rounded-xl text-left text-slate-300 hover:bg-[#1a1d26] hover:text-white font-medium"
+                >
+                  Right Lateral
+                </button>
+                <div className="h-px bg-[#202430] my-0.5" />
+                <button
+                  onClick={() => setCameraPreset('isometric')}
+                  className="px-3 py-1.5 rounded-xl text-left text-amber-400 hover:bg-[#1a1d26] font-semibold flex items-center gap-1.5"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                  <span>Reset Camera</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
+
+      {/* Mobile Layers Drawer Modal (< md) */}
+      {mobileLayersOpen && (
+        <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-end">
+          <div
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200"
+            onClick={() => setMobileLayersOpen(false)}
+          />
+
+          <div className="relative z-10 bg-[#101218] border-t border-[#232736] rounded-t-3xl p-5 shadow-2xl max-h-[82vh] overflow-y-auto space-y-4 animate-in slide-in-from-bottom duration-200">
+            <div className="flex items-center justify-between border-b border-[#1f232d] pb-3">
+              <div className="flex items-center gap-2">
+                <Layers className="w-4 h-4 text-amber-400" />
+                <span className="text-sm font-bold uppercase tracking-wider text-white">
+                  Anatomical Layers
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <div className="flex bg-[#181b24] border border-[#272c3b] rounded-xl p-0.5 text-xs">
+                  <button
+                    onClick={() => setGender('male')}
+                    className={`px-3 py-1 rounded-lg font-semibold transition-colors ${
+                      gender === 'male' ? 'bg-[#222736] text-amber-300 border border-amber-500/30' : 'text-slate-400'
+                    }`}
+                  >
+                    Male
+                  </button>
+                  <button
+                    onClick={() => setGender('female')}
+                    className={`px-3 py-1 rounded-lg font-semibold transition-colors ${
+                      gender === 'female' ? 'bg-[#222736] text-amber-300 border border-amber-500/30' : 'text-slate-400'
+                    }`}
+                  >
+                    Female
+                  </button>
+                </div>
+
+                <button
+                  onClick={() => setMobileLayersOpen(false)}
+                  className="p-1.5 rounded-xl bg-[#181b24] border border-[#272c3b] text-slate-400 hover:text-white"
+                  title="Close"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Layer toggles */}
+            <div className="space-y-2 text-xs">
+              {[
+                { id: 'skin', label: 'Integumentary (Skin)' },
+                { id: 'muscular', label: 'Muscular System' },
+                { id: 'skeletal', label: 'Skeletal System' },
+                { id: 'circulatory', label: 'Circulatory (Vessels)' },
+                { id: 'nervous', label: 'Nervous System' },
+                { id: 'organs', label: 'Internal Organs' },
+              ].map((layerItem) => {
+                const key = layerItem.id as keyof LayerVisibility;
+                const isVisible = layers[key];
+                return (
+                  <button
+                    key={layerItem.id}
+                    onClick={() => toggleLayer(key)}
+                    className={`w-full px-3.5 py-2.5 rounded-xl text-left font-medium transition-all flex items-center justify-between border ${
+                      isVisible
+                        ? 'bg-[#1a1d27] text-white border-amber-500/40 shadow-sm'
+                        : 'bg-[#14161f]/50 text-slate-500 border-[#1c1f28]'
+                    }`}
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <span className={`w-2.5 h-2.5 rounded-full ${isVisible ? 'bg-amber-400' : 'bg-slate-700'}`} />
+                      <span className="text-xs font-semibold">{layerItem.label}</span>
+                    </span>
+                    <Eye className={`w-4 h-4 ${isVisible ? 'text-amber-400' : 'text-slate-600'}`} />
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="pt-2 border-t border-[#1f232d] flex items-center justify-between text-xs text-slate-400">
+              <button
+                onClick={() =>
+                  setLayers({
+                    skin: true,
+                    muscular: true,
+                    skeletal: true,
+                    circulatory: true,
+                    nervous: true,
+                    organs: true
+                  })
+                }
+                className="py-1 px-2 rounded hover:text-amber-400 transition-colors"
+              >
+                Show All
+              </button>
+              <button
+                onClick={() =>
+                  setLayers({
+                    skin: false,
+                    muscular: false,
+                    skeletal: false,
+                    circulatory: false,
+                    nervous: false,
+                    organs: true
+                  })
+                }
+                className="py-1 px-2 rounded hover:text-amber-400 transition-colors"
+              >
+                Isolate Organs
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+
 
